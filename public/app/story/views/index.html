@@ -1,0 +1,10 @@
+<div class="jumbotron">
+  <h1>Story {{ main.story.id }} : {{ main.story.name }} </h1>
+</div>
+
+<issue-form story="main.story"></issue-form>
+<section id="cd-timeline" class="cd-container">
+	<div class="cd-timeline-block" ng-repeat="data in main.posts">
+			<post-content></post-content>
+	</div>
+</section>

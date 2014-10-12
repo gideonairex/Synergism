@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Synergism</title>
+		<!-- link rel="stylesheet" href="css/reset.css" --> <!-- CSS reset -->
+		<link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css"> <!-- CSS reset -->
+		<link rel="stylesheet" href="css/style.css"> <!-- Resource style -->
+	</head>
+	<body ng-app="synergism">
+    <div ng-view></div>
+	</body>
+	<script src="lib/angular/angular.js"></script>
+	<script src="lib/angular-route/angular-route.js"></script>
+
+	<!-- Modules -->
+	<!-- Need to add require.js for lazy loading -->
+	<script src="app/story/controllers/IssueCtrl.js"></script>
+	<script src="app/story/controllers/StoryCtrl.js"></script>
+	<script src="app/story/controllers/PostCtrl.js"></script>
+	<script src="app/story/story.js"></script>
+	<!-- Controllers -->
+
+	<!-- Main App -->
+	<script src="app/app.js"></script>
+
+	</body>
+</html>

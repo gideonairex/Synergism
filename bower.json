@@ -1,0 +1,31 @@
+{
+  "name": "Synergism",
+  "version": "1.0.0",
+  "homepage": "https://github.com/gideonairex/Synergism",
+  "authors": [
+    "Gideon Rosales <gideonrosales@gmail.com>"
+  ],
+  "description": "Synergism",
+  "main": "server.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "synergism",
+    "collaboration",
+    "ontime"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "public/lib",
+    "public/test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.2.26",
+    "bootstrap": "~3.2.0",
+    "angular-route": "~1.2.26"
+  }
+}

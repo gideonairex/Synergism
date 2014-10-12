@@ -1,0 +1,31 @@
+{
+  "name": "Synergism",
+  "version": "1.0.0",
+  "description": "Collaboration tool",
+  "main": "server.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gideonairex/Synergism.git"
+  },
+  "keywords": [
+    "collaboration"
+  ],
+  "author": "Gideon Rosales",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gideonairex/Synergism/issues"
+  },
+  "homepage": "https://github.com/gideonairex/Synergism",
+  "dependencies": {
+    "bell": "^1.1.0",
+    "handlebars": "^2.0.0",
+    "hapi": "^6.11.1",
+    "lodash": "^2.4.1",
+    "nipple": "^2.5.6",
+    "pg": "^3.5.0",
+    "sequelize": "^2.0.0-rc1"
+  }
+}
