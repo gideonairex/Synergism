@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body>
+	<script>
+		var obj = {};
+		var url = window.location.href.split( '?' );
+		var _queries = url[ 1 ].split( '&' );
+		for( var i = 0; i < _queries.length; i++ ) {
+			var _query = _queries[ i ].split( '=' );
+			obj[ _query[0] ] = _query[ 1 ];
+		}
+		document.cookie = 'x-ontime-auth-code=' + obj.code;
+		window.location = '/#/retrieve_ontime_auth_code';
+	</script>
+	</body>
+</html>

@@ -1,10 +1,13 @@
 <div class="jumbotron">
-  <h1>Story {{ main.story.id }} : {{ main.story.name }} </h1>
+	<h1>Story {{ main.story.id }} : {{ main.story.name }} </h1>
 </div>
-
+<a ng-click="main.logout()">Logout</a>
 <issue-form story="main.story"></issue-form>
 <section id="cd-timeline" class="cd-container">
+		<div class="cd-timeline-img cd-location">
+			<img ng-src="img/cd-icon-location.svg" alt="Picture">
+		</div> <!-- cd-timeline-img -->
 	<div class="cd-timeline-block" ng-repeat="data in main.posts">
-			<post-content></post-content>
+		<post-content></post-content>
 	</div>
 </section>

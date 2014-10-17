@@ -1,4 +1,4 @@
-var _ = require( 'lodash' );
+var _   = require( 'lodash' );
 var pkg = require( './package.json' );
 
 exports.register = function ( plugin, options, next ) {

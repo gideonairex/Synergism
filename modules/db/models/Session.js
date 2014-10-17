@@ -3,25 +3,28 @@ var Base      = require( '../base/base' );
 var _         = require( 'lodash' );
 var crypto    = require( 'crypto' );
 
-module.exports = function ( sequelize ) {
+module.exports = function ( sequelize, utils ) {
 
 	// 1 hours
 	var offset = 1;
 
-	var hash = function () {
-		var currentDate = ( new Date() ).valueOf().toString();
-		var random      = Math.random().toString();
-		return crypto.createHash( 'sha1' ).update(currentDate + random).digest('hex');
-	};
-
 	return {
 
-		'Session' : sequelize.define( 'Session', _.extend( {
+		'Session' : sequelize.define( 'session', _.extend( {
 
 			sessionToken : {
 				type   : Sequelize.STRING,
-				unique : true,
-				defaultValue : hash()
+				unique : true
+			},
+
+			refreshToken : {
+				type   : Sequelize.STRING,
+				unique : true
+			},
+
+			authorizationCode : {
+				type   : Sequelize.STRING,
+				unique : true
 			},
 
 			ontimeAccessToken : {
@@ -29,7 +32,9 @@ module.exports = function ( sequelize ) {
 			},
 
 			userId : {
-				type : Sequelize.INTEGER
+				type          : Sequelize.INTEGER,
+				references    : 'users',
+				referencesKey : 'id'
 			},
 
 			expiresAt : {
@@ -42,7 +47,17 @@ module.exports = function ( sequelize ) {
 				beforeCreate : function ( session ) {
 					var d = new Date();
 					d.setHours( d.getHours() + offset );
-					session.dataValues.sessionToken = hash();
+
+					session.dataValues.sessionToken      = utils.hash( { salt : 'sessionSalt' } );
+					session.dataValues.refreshToken      = utils.hash( { salt : 'refreshSalt' } );
+					session.dataValues.authorizationCode = utils.hash( { salt : 'authSalt' } );
+					session.dataValues.expiresAt         = d;
+
+				},
+				beforeUpdate : function ( session ) {
+					var d = new Date();
+					d.setHours( d.getHours() + offset );
+
 					session.dataValues.expiresAt = d;
 				}
 			}

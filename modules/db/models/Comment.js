@@ -6,18 +6,22 @@ module.exports = function ( sequelize ) {
 
 	return {
 
-		'Comment' : sequelize.define( 'Comment', _.extend ( {
+		'Comment' : sequelize.define( 'comment', _.extend ( {
 
 			postId : {
-				type : Sequelize.INTEGER
+				type : Sequelize.INTEGER,
+				references : 'posts',
+				referencesKey : 'id'
+			},
+
+			userId : {
+				type : Sequelize.INTEGER,
+				references : 'users',
+				referencesKey : 'id'
 			},
 
 			comment : {
 				type : Sequelize.TEXT
-			},
-
-			userId : {
-				type : Sequelize.INTEGER
 			}
 
 		}, Base ) )

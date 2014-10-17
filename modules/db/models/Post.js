@@ -6,7 +6,7 @@ module.exports = function ( sequelize ) {
 
 	return {
 
-		'Post' : sequelize.define( 'Post', _.extend( {
+		'Post' : sequelize.define( 'post', _.extend( {
 
 			storyId : {
 				type : Sequelize.INTEGER
@@ -16,9 +16,6 @@ module.exports = function ( sequelize ) {
 				type : Sequelize.STRING
 			},
 
-			userId : {
-				type : Sequelize.INTEGER
-			},
 
 			content : {
 				type : Sequelize.TEXT
@@ -26,6 +23,12 @@ module.exports = function ( sequelize ) {
 
 			title : {
 				type : Sequelize.STRING
+			},
+
+			userId : {
+				type : Sequelize.INTEGER,
+				references : 'users',
+				referencesKey : 'id'
 			}
 
 		}, Base ) )

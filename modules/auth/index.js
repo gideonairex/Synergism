@@ -5,6 +5,11 @@ var _error = Hapi.error;
 
 exports.register = function ( plugin, options, next ) {
 
+	var routes = _.union(
+		require( './oauth' )( options )
+	);
+
+	plugin.route( routes );
 	plugin.auth.scheme( 'api-scheme', strategies.apiStrategy );
 	plugin.auth.strategy( 'api-auth', 'api-scheme', { authenticate : true, session : options.models.Session, user : options.models.User } );
 	next();
@@ -23,29 +28,24 @@ strategies.apiStrategy = function ( server, options ) {
 		authenticate : function ( request, reply ) {
 			var _headers = request.headers;
 			var _query   = request.query;
-
-			var AppId = _headers[ 'x-synergism-app' ] || _query[ 'x-synergism-app' ];
-
-			if ( !AppId ) {
-				return reply( _error.unauthorized( 'Sorry dong' ) );
-			}
-
-			var sessionToken = request.state[ 'synergism-session' ];
-
+			var token    = _headers[ 'x-synergism-token' ] || _query[ 'x-synergism-token' ];
 			Session.find( {
-				where : { sessionToken : sessionToken }
+				where : { sessionToken : token, deleted : false }
 			} ).then( function ( session ) {
 				if( session ) {
 					if( session.dataValues.expiresAt > new Date() ) {
 						User.find( { where : { id : session.dataValues.userId } } )
 								.then ( function ( user ) {
-									reply ( null, { credentials : _.extend( user.dataValues, session.dataValues ) } );
+									reply ( null, { credentials : _.extend( { userDetails : user.dataValues }, { userSession : session.dataValues }, { userModel : user }, { sessionModel : session } ) } );
 								} );
 					} else {
-						return reply( _error.forbidden( 'Wa na ang imong session' ) );
+						var error = _error.badRequest( 'Session expired' );
+						    error.output.statusCode = 440;    // Session expired status
+								error.reformat();
+						return reply( error );
 					}
 				} else {
-					return reply( _error.forbidden( 'Missing ka dont' ) );
+					return reply( _error.forbidden( 'Missing ka dong' ) );
 				}
 			} );
 

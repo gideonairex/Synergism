@@ -5,14 +5,18 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Synergism</title>
 		<!-- link rel="stylesheet" href="css/reset.css" --> <!-- CSS reset -->
-		<link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css"> <!-- CSS reset -->
 		<link rel="stylesheet" href="css/style.css"> <!-- Resource style -->
+		<link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css"> <!-- Resource style -->
+
 	</head>
 	<body ng-app="synergism">
-    <div ng-view></div>
+		<div ng-view></div>
 	</body>
 	<script src="lib/angular/angular.js"></script>
+	<script src="lib/angular-cookies/angular-cookies.js"></script>
 	<script src="lib/angular-route/angular-route.js"></script>
+	<script src="lib/angular-strap/dist/angular-strap.js"></script>
+	<script src="lib/angular-strap/dist/angular-strap.tpl.js"></script>
 
 	<!-- Modules -->
 	<!-- Need to add require.js for lazy loading -->
@@ -20,6 +24,10 @@
 	<script src="app/story/controllers/StoryCtrl.js"></script>
 	<script src="app/story/controllers/PostCtrl.js"></script>
 	<script src="app/story/story.js"></script>
+
+	<script src="app/user/controllers/OntimeAuthCtrl.js"></script>
+	<script src="app/user/controllers/LoginCtrl.js"></script>
+	<script src="app/user/user.js"></script>
 	<!-- Controllers -->
 
 	<!-- Main App -->

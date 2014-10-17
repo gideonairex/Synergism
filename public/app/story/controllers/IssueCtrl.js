@@ -4,9 +4,9 @@ angular.module( 'synergism.story.issue-controller', [] )
 			this.submit = function() {
 				if ( $scope.story.id ) {
 					$scope.issue.data.storyId = $scope.story.id;
-					$http.post( '/v1/posts?x-synergism-app=xs', $scope.issue.data )
+					$http.post( '/v1/posts', $scope.issue.data )
 								.success( function( data, status, headers, config ) {
-									console.log( arguments );
+									$scope.$parent.main.posts.unshift( data.data );
 								 })
 								.error( function( data, status, headers, config ) {
 									console.log( arguments );
@@ -14,6 +14,4 @@ angular.module( 'synergism.story.issue-controller', [] )
 				} else {
 					alert ( 'No story' );
 				}
-
-			}
-	} ] );
+} } ] );

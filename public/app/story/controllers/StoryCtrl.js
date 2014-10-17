@@ -1,19 +1,35 @@
 angular.module( 'synergism.story.main-controller', [] )
-	.controller( 'StoryCtrl', [ '$http', '$routeParams', function( $http, $routeParams ) {
+	.controller( 'StoryCtrl', [ '$http', '$routeParams', 'Authentication', 'Session', '$location', function( $http, $routeParams, Authentication, Session, $location ) {
 
-	var self = this;
-	this.posts = [];
-	this.story = {};
+		var self = this;
+		this.posts = [];
+		this.story = {};
 
-	$http.get( '/v1/story/'+ $routeParams.id + '?x-synergism-app=xs' )
-				.success( function ( resp ) {
-					self.story = resp.data;
-					$http.get( '/v1/posts?x-synergism-app=xs&story=' + self.story.id )
-						.then( function ( data ) {
-							// fix format
-							self.posts = data.data.data;
-							console.log( self.posts );
-						} );
-				} );
+		$http.get( '/v1/story/'+ $routeParams.id )
+					.success( function ( resp ) {
+						self.story = resp.data;
+						$http.get( '/v1/posts?story=' + self.story.id )
+							.then( function ( data ) {
+								// fix format
+								if ( data.data.data ) {
+									self.posts = data.data.data;
+								}
+							} );
+					} );
+
+		this.logout = function() {
+			if( Authentication.isAuthenticated() ) {
+				$http.get( '/v1/logout' )
+					.success( function () {
+						Session.destory();
+						$location.path( '/login' );
+					} )
+					.error( function () {
+						console.log( 'aym error');
+					} );
+			} else {
+				$location.path( '/login' );
+			}
+		}
 
 } ] );

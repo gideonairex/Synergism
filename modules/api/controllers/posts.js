@@ -19,11 +19,13 @@ module.exports = function ( options ) {
 						query.storyId = request.query.story;
 					}
 
-					Post.find( { where : query } )
+					Post.find( { where : query , order : ' "createdAt" DESC' } )
 							.then( function ( post ) {
 								if( post ) {
 									if ( post.dataValues.link.match ( regexURL ) ) {
-										post.dataValues.type = 'video';
+										post.dataValues.type = 'movie';
+									} else {
+										post.dataValues.type = 'picture';
 									}
 									reply( { 'data' : post.dataValues } );
 								}
@@ -32,7 +34,7 @@ module.exports = function ( options ) {
 				} else {
 
 					if ( request.query.story ) {
-						query = { where: { storyId : request.query.story } };
+						query = { where: { storyId : request.query.story }, order: ' "createdAt" DESC' };
 					}
 
 					Post.findAll( query )
@@ -67,10 +69,15 @@ module.exports = function ( options ) {
 				Post.create( {
 					storyId : request.payload.storyId,
 					link    : request.payload.link,
-					userId  : user.id,
+					userId  : user.userId,
 					content : request.payload.content,
 					title   : request.payload.title
 				} ).then( function ( post, created ) {
+					if ( post.dataValues.link.match ( regexURL ) ) {
+						post.dataValues.type = 'movie';
+					} else {
+						post.dataValues.type = 'picture';
+					}
 					reply( { data : post.dataValues } );
 				} );
 			},

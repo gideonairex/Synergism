@@ -20,6 +20,13 @@ module.exports = function ( options ) {
 			}
 		},
 		{
+			path    : '/',
+			method  : 'GET',
+			handler : function ( request, reply ) {
+				reply.view( 'index' );
+			}
+		},
+		{
 			path    : '/{params*}',
 			method  : 'GET',
 			handler : {

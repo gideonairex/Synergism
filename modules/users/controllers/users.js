@@ -2,42 +2,34 @@ var Hapi  = require( 'hapi' );
 var error = Hapi.error;
 
 module.exports = function ( options ) {
-	var User = options.models.User;
 
 	return [
 		{
-			path : '/v1/users/{username?}',
+			path : '/v1/me',
 			method : 'GET',
-			handler : function ( request, reply ) {
-
-				if ( request.params.username ) {
-					User.find( { where : { username : request.params.username } } )
-							.success( function ( user ) {
-								console.log( user );
-							} );
-				} else {
-					User.findAll( {} )
-							.success( function ( users ) {
-
-								console.log( users );
+			handler : function( request, reply ) {
+				var userModel = request.auth.credentials.userModel;
+				userModel.find( {
+					where : { id : userModel.dataValues.id }
+				} ).then( function( me ) {
+					delete me.dataValues.password;
+					reply( {
+						'class'      : [ 'user' ],
+						'properties' : me.dataValues,
+						'actions'    : [
+							{
+								'name'        : 'logout',
+								'title'       : 'Logout user',
+								'description' : 'Destroy session',
+								'method'      : 'GET',
+								'href'        : '/v1/logout'
+							}
+						]
 					} );
-				}
-
-				reply( { 'info' : 'get all users' } );
-			}
-		},{
-			path : '/v1/users',
-			method : 'POST',
-			handler : function ( request, reply ) {
-
-				User.findOrCreate( {
-					where : { username : request.payload.username }
-				}, { password : request.payload.password } )
-						.success( function ( user, created ) {
-							console.log( user );
-							console.log( created );
-							reply( { 'data' : 'asd' } );
-						} );
+				} );
+			},
+			config : {
+				auth : 'api-auth'
 			}
 		}
 	];

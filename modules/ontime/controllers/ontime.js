@@ -2,17 +2,57 @@ var Nipple = require( 'nipple' );
 
 module.exports = function ( options ) {
 
-	var User    = options.models.User;
-	var Session = options.models.Session;
+	var config        = options;
+	var User          = options.models.User;
+	var Session       = options.models.Session;
+	var ResourceOwner = options.models.ResourceOwner;
 
-	var createSession = function ( access_token, user_id, reply ) {
+	var createSession = function ( access_token, user_id, cb ) {
 
 		Session.create( {
 			ontimeAccessToken : access_token,
 			userId            : user_id
 		} ).then ( function ( session ) {
-			reply.state( 'synergism-session', session.dataValues.sessionToken );
-			reply.redirect( '/' );
+			//find a better solution to create hypermedia
+				cb( {
+
+					'class' : [ 'session' ],
+
+					'properties' : {
+						'bearerToken'  : session.dataValues.sessionToken,
+						'refreshToken' : session.dataValues.refreshToken
+					},
+
+					'entities' : [
+						{
+							'class' : [ 'user' ],
+							'rel'   : [ '/v1/me' ],
+							'properties' : {
+								'userId' : user_id
+							},
+							'href'  : '/v1/me'
+						}
+					],
+
+					'actions' : [
+						{
+							'name'        : 'refresh-token',
+							'title'       : 'Refresh Token',
+							'description' : 'This is to refresh the bearerToken',
+							'method'      : 'GET',
+							'href'        : '/oauth/refresh_token',
+							'alternative' : 'Instead of query string, add fields on headers',
+							'fields' : [
+								{
+									'name' : 'x-synergism-refresh-token',
+									'type' : 'text'
+								}
+							]
+						}
+					]
+
+				} );
+			//cb( { 'bearerToken' : session.dataValues.sessionToken, 'refreshToken' : session.dataValues.refreshToken } );
 		} );
 
 		return;
@@ -24,7 +64,7 @@ module.exports = function ( options ) {
 			path : '/v1/story/{id?}',
 			method : 'GET',
 			handler : function ( request, reply ) {
-				var ontimeToken = request.auth.credentials.ontimeAccessToken;
+				var ontimeToken = request.auth.credentials.userSession.ontimeAccessToken;
 				var req         = 'https://synergism.axosoft.com/api/v2/features?access_token=' + ontimeToken;
 				if( request.params.id ) {
 					req = 'https://synergism.axosoft.com/api/v2/features/'+ request.params.id + '?access_token=' + ontimeToken;
@@ -43,26 +83,37 @@ module.exports = function ( options ) {
 			method: 'GET',
 			handler: function ( request, reply ) {
 				var code   = request.url.query.code;
-				var params = 'grant_type=authorization_code&code=' + code + '&redirect_uri=http://localhost:9000/receive_auth_code&client_id=a488a031-39a2-48c8-a5c2-5368a4c27587&client_secret=a1a9ac5d-d8e4-4975-925d-19e419a1d636';
-
+				var params = 'grant_type=' + config.ONTIME_GRANT_TYPE
+										+ '&code=' + code
+										+ '&redirect_uri=' + config.ONTIME_REDIRECT_URI
+										+ '&client_id=' + config.ONTIME_CLIENT_ID
+										+ '&client_secret=' + config.ONTIME_CLIENT_SECRET;
 				Nipple.get( 'https://synergism.axosoft.com/api/oauth2/token?'+ params, function ( err, res, payload) {
-
 					var payloadObj = JSON.parse( payload );
-
 					User.find( {
 						where : { email : payloadObj.data.email },
 					} )
 					.then( function ( user ) {
 						if ( user ) {
-							createSession( payloadObj.access_token, user.dataValues.id, reply );
+							createSession( payloadObj.access_token, user.dataValues.id, function ( tokens ) {
+								reply( tokens );
+							} );
 						} else {
+
 							User.create( {
 								email     : payloadObj.data.email,
 								firstname : payloadObj.data.first_name,
 								lastname  : payloadObj.data.last_name
 							} ).then ( function ( createdUser ) {
-								createSession( payloadObj.access_token, createdUser.dataValues.id, reply );
+								ResourceOwner.create( {
+									userId : createdUser.dataValues.id
+								} ).then( function( resource ) {
+										createSession( payloadObj.access_token, createdUser.dataValues.id, function ( tokens ) {
+											reply( tokens );
+									} );
+								} );
 							} );
+
 						}
 					} );
 
