@@ -1,4 +1,6 @@
 var Nipple = require( 'nipple' );
+var sys    = require('sys')
+var exec   = require('child_process').exec;
 
 module.exports = function ( options ) {
 
@@ -64,6 +66,18 @@ module.exports = function ( options ) {
 			path : '/v1/story/{id?}',
 			method : 'GET',
 			handler : function ( request, reply ) {
+				var child;
+				if( request.query.commit ) {
+					var commit = request.query.commit.trim();
+					child = exec("cd ~/GlobalZeal/pd360-html/; git reset --hard " + commit + "; pm2 restart server1;", function (error, stdout, stderr) {
+						sys.print('stdout: ' + stdout);
+						sys.print('stderr: ' + stderr);
+						if (error !== null) {
+							console.log('exec error: ' + error);
+						}
+					});
+				}
+
 				var ontimeToken = request.auth.credentials.userSession.ontimeAccessToken;
 				var req         = 'https://synergism.axosoft.com/api/v2/features?access_token=' + ontimeToken;
 				if( request.params.id ) {

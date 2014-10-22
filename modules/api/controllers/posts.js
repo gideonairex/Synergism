@@ -9,7 +9,7 @@ module.exports = function ( options ) {
 			path : '/v1/posts/{postid?}',
 			method : 'GET',
 			handler : function( request, reply ) {
-
+				//console.log( request.raw.req.connection.remoteAddress ) ;
 				var query = {};
 
 				if ( request.params.postid ) {

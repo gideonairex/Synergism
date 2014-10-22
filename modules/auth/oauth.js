@@ -11,8 +11,8 @@ module.exports = function ( option ) {
 			path    : '/oauth/refresh_token',
 			method  : 'GET',
 			handler : function ( request, reply ) {
-				var _headers = request.headers;
-				var _query = request.query;
+				var _headers     = request.headers;
+				var _query       = request.query;
 				var refreshToken = _headers[ 'x-synergism-refresh-token' ] || _query[ 'x-synergism-refresh-token' ];
 				Session.find ( {
 					where : { refreshToken : refreshToken, deleted : false }

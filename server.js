@@ -3,6 +3,7 @@ var Hapi      = require( 'hapi' );
 var Sequelize = require( 'sequelize' );
 var _         = require( 'lodash' );
 var Path      = require( 'path' );
+var redis     = require( 'redis' );
 
 var config = {
 	APP_PORT             : 9000,
@@ -15,7 +16,8 @@ var config = {
 	ONTIME_CLIENT_ID     : 'a488a031-39a2-48c8-a5c2-5368a4c27587',
 	ONTIME_CLIENT_SECRET : 'a1a9ac5d-d8e4-4975-925d-19e419a1d636',
 	ONTIME_GRANT_TYPE    : 'authorization_code',
-	ONTIME_REDIRECT_URI  : 'http://localhost:9000/auth.html'
+	ONTIME_REDIRECT_URI  : 'http://localhost:9099/auth.html',
+	ENV                  : 'development'
 };
 
 var serverOptions = {
@@ -39,12 +41,16 @@ var serverOptions = {
 
 var server = new Hapi.Server( config.APP_PORT, serverOptions );
 
+var redisClient = redis.createClient();
+redisClient.on( 'connect', function() { } );
+
 var sequelize = new Sequelize(
 			config.PSQL_DB,
 			config.PSQL_USER,
 			config.PSQL_PASSWORD, {
 				dialect : 'postgres',
 				port    : config.PSQL_PORT,
+				logging : false // change this depending on ENV
 });
 
 sequelize
@@ -60,7 +66,7 @@ sequelize
 //sequelize.sync(); add this if tables are not existing yet
 //sequelize.sync( {force:true} );
 
-var utils  = require( config.MODULEDIR + 'utils' )( config );
+var utils  = require( config.MODULEDIR + 'utils' )( config, redisClient );
 var models = require( config.MODULEDIR + 'db' )( sequelize, utils );
 
 var opt = {
@@ -70,23 +76,23 @@ var opt = {
 
 server.pack.register( [
 	{
-		plugin : require( config.MODULEDIR + 'auth' ),
+		plugin  : require( config.MODULEDIR + 'auth' ),
 		options : _.extend( {}, opt )
 	},
 	{
-		plugin : require( config.MODULEDIR + 'users' ),
+		plugin  : require( config.MODULEDIR + 'users' ),
 		options : _.extend( {}, opt )
 	},
 	{
-		plugin : require( config.MODULEDIR + 'ontime' ),
+		plugin  : require( config.MODULEDIR + 'ontime' ),
 		options : _.extend( {}, opt, config )
 	},
 	{
-		plugin : require( config.MODULEDIR + 'gui' ),
+		plugin  : require( config.MODULEDIR + 'gui' ),
 		options : _.extend( {}, opt )
 	},
 	{
-		plugin : require( config.MODULEDIR + 'api' ),
+		plugin  : require( config.MODULEDIR + 'api' ),
 		options : _.extend( {}, opt )
 	}
 ], function ( error ) {

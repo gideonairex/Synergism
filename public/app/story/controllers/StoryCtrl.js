@@ -5,7 +5,11 @@ angular.module( 'synergism.story.main-controller', [] )
 		this.posts = [];
 		this.story = {};
 
-		$http.get( '/v1/story/'+ $routeParams.id )
+		var get = '/v1/story/' + $routeParams.id;
+		if( $routeParams.commit ) {
+			get += '?commit=' + $routeParams.commit;
+		}
+		$http.get( get )
 					.success( function ( resp ) {
 						self.story = resp.data;
 						$http.get( '/v1/posts?story=' + self.story.id )
